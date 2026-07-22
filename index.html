@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealGuardian AI – Smart Deal Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== RESET & BASE ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #07090f;
+            --bg-secondary: #0e111a;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --gradient-start: #00d4ff;
+            --gradient-mid: #7b2ffc;
+            --gradient-end: #ff6fd8;
+            --shadow-glow: 0 20px 60px rgba(0, 212, 255, 0.15);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== UTILITY ===== */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-label {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--gradient-start);
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 44px;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* ===== GLOW BACKGROUND ===== */
+        .glow-orb {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .glow-orb--1 {
+            top: -200px;
+            right: -100px;
+            background: var(--gradient-start);
+        }
+        .glow-orb--2 {
+            bottom: -200px;
+            left: -100px;
+            background: var(--gradient-mid);
+        }
+
+        /* ===== HEADER / NAV ===== */
+        .header {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 9, 15, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-start);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-outline {
+            padding: 10px 24px;
+            border-radius: 60px;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-primary-nav {
+            padding: 10px 28px;
+            border-radius: 60px;
+            background: var(--gradient-start);
+            color: #0b0d15;
+            font-weight: 700;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .mobile-toggle span {
+            display: block;
+            width: 28px;
+            height: 2.5px;
+            background: var(--text-primary);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero .badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.06);
+            color: var(--gradient-start);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            margin-bottom: 28px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero h1 {
+            font-size: 68px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -3px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-primary {
+            padding: 16px 40px;
+            border-radius: 60px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+            color: #fff;
+            font-weight: 800;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-hero-secondary {
+            padding: 16px 40px;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 18px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-4px);
+        }
+
+        /* ===== FEATURES ===== */
+        .features {
+            padding: 80px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            transition: var(--transition);
+            text-align: left;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(0, 212, 255, 0.15);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card .icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .feature-card .tag {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.06);
+            color: var(--gradient-start);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 212, 255, 0.06);
+        }
+
+        .feature-card .tag.purple {
+            background: rgba(123, 47, 252, 0.06);
+            color: #a78bfa;
+            border-color: rgba(123, 47, 252, 0.06);
+        }
+
+        .feature-card .tag.pink {
+            background: rgba(255, 111, 216, 0.06);
+            color: #f472b6;
+            border-color: rgba(255, 111, 216, 0.06);
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .step .number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 47, 252, 0.1));
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--gradient-start);
+            margin-bottom: 20px;
+            border: 2px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .step h4 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            padding: 80px 0;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+            margin-top: 20px;
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            transition: var(--transition);
+        }
+
+        .testimonial-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .testimonial-card .stars {
+            color: #fbbf24;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .testimonial-card blockquote {
+            font-size: 17px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .testimonial-card .author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-card .author .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .testimonial-card .author .info {
+            font-size: 14px;
+        }
+
+        .testimonial-card .author .info strong {
+            display: block;
+            color: var(--text-primary);
+        }
+
+        .testimonial-card .author .info span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ===== PRICING ===== */
+        .pricing {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            margin-top: 30px;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--gradient-start);
+            background: rgba(0, 212, 255, 0.02);
+        }
+
+        .pricing-card .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-start);
+            color: #0b0d15;
+            padding: 4px 18px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-card h4 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pricing-card .price {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 16px 0 4px;
+        }
+
+        .pricing-card .price span {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .pricing-card .description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .pricing-card ul {
+            text-align: left;
+            margin: 0 0 30px;
+            padding: 0;
+        }
+
+        .pricing-card ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-card ul li::before {
+            content: '✓';
+            color: var(--gradient-start);
+            font-weight: 900;
+        }
+
+        .btn-pricing {
+            display: inline-block;
+            padding: 14px 36px;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            font-weight: 700;
+            transition: var(--transition);
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-pricing:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-pricing.primary {
+            background: var(--gradient-start);
+            color: #0b0d15;
+            border-color: var(--gradient-start);
+        }
+
+        .btn-pricing.primary:hover {
+            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        /* ===== FAQ ===== */
+        .faq {
+            padding: 80px 0;
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 30px auto 0;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 18px 0;
+            cursor: pointer;
+        }
+
+        .faq-item .question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .faq-item .question:hover {
+            color: var(--gradient-start);
+        }
+
+        .faq-item .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .faq-item.active .answer {
+            max-height: 300px;
+            padding-top: 12px;
+        }
+
+        .faq-item .icon-toggle {
+            font-size: 24px;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .faq-item.active .icon-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 40px 0 30px;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 16px;
+                background: var(--bg-secondary);
+                padding: 20px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--border-subtle);
+                position: absolute;
+                top: 70px;
+                right: 20px;
+                width: 200px;
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .mobile-toggle {
+                display: flex;
+            }
+            .hero h1 {
+                font-size: 40px;
+            }
+            .hero p {
+                font-size: 17px;
+            }
+            .section-title {
+                font-size: 32px;
+            }
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            .pricing-card.popular {
+                order: -1;
+            }
+        }
+
+        /* Scroll reveal (simple) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Glow Orbs -->
+    <div class="glow-orb glow-orb--1"></div>
+    <div class="glow-orb glow-orb--2"></div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container">
+            <div class="logo"><span>DealGuardian</span></div>
+            <nav class="nav-links" id="navMenu">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="pitch.html" class="btn-outline">Pitch Generator</a>
+                <a href="legaleagle.html" class="btn-primary-nav">LegalEagle</a>
+            </nav>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="container">
+            <div class="badge">⚡ AI-Powered Deal Intelligence</div>
+            <h1>
+                Close Deals<br />
+                <span class="highlight">with AI Precision</span>
+            </h1>
+            <p>
+                Generate professional sales pitches instantly and scan contracts for hidden risks — all in one powerful platform.
+            </p>
+            <div class="hero-actions">
+                <a href="pitch.html" class="btn-hero-primary">📈 Try Pitch Generator</a>
+                <a href="legaleagle.html" class="btn-hero-secondary">⚖️ Try LegalEagle</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">Features</span>
+                <h2 class="section-title">Everything you need to <span class="gradient-text">win deals</span></h2>
+                <p class="section-subtitle">
+                    Two powerful AI agents work together to give you the competitive edge.
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <span class="icon">📈</span>
+                    <h3>Pitch Generator</h3>
+                    <p>
+                        Paste any company's 'About Us' text and instantly receive a professional 3‑sentence pitch, complete with industry insights and pain point analysis.
+                    </p>
+                    <span class="tag">AI Agent 1</span>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="icon">⚖️</span>
+                    <h3>LegalEagle</h3>
+                    <p>
+                        Paste a contract or Terms of Service. Get a Fairness Score, a breakdown of hidden risks, and a plain‑English translation that anyone can understand.
+                    </p>
+                    <span class="tag purple">AI Agent 2</span>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="icon">🧠</span>
+                    <h3>Unified Strategy</h3>
+                    <p>
+                        Combine both analyses to generate a master negotiation strategy, deal viability score, and actionable next steps.
+                    </p>
+                    <span class="tag pink">Coming Soon</span>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="icon">⚡</span>
+                    <h3>Instant Results</h3>
+                    <p>
+                        No waiting. Our AI agents deliver results in under 2 seconds, so you can move fast and close deals faster.
+                    </p>
+                    <span class="tag">Fast</span>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="icon">🔒</span>
+                    <h3>Secure & Private</h3>
+                    <p>
+                        Your data is never stored or shared. All processing is temporary and confidential.
+                    </p>
+                    <span class="tag purple">Privacy First</span>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="icon">💼</span>
+                    <h3>Sales-Ready Output</h3>
+                    <p>
+                        Every pitch and contract analysis is formatted for immediate use — download as text files and send to your team.
+                    </p>
+                    <span class="tag pink">Productivity</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">Simple Workflow</span>
+                <h2 class="section-title">Get results in <span class="gradient-text">3 steps</span></h2>
+                <p class="section-subtitle">
+                    No complex setup – just paste, click, and act.
+                </p>
+            </div>
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="number">1</div>
+                    <h4>Paste Your Content</h4>
+                    <p>Paste a company bio or contract text into the relevant tool.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="number">2</div>
+                    <h4>Let AI Analyze</h4>
+                    <p>Our AI agents scan for key insights, risks, and opportunities.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="number">3</div>
+                    <h4>Download & Act</h4>
+                    <p>Get your pitch, fairness score, and plain‑English translation in seconds.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">Testimonials</span>
+                <h2 class="section-title">Loved by <span class="gradient-text">sales professionals</span></h2>
+                <p class="section-subtitle">
+                    See what early adopters are saying about DealGuardian AI.
+                </p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card reveal">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>“The Pitch Generator saved me hours of research. I closed a deal in 2 days that would have taken a week.”</blockquote>
+                    <div class="author">
+                        <div class="avatar">JD</div>
+                        <div class="info">
+                            <strong>James Dalton</strong>
+                            <span>Head of Sales, TechFlow</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>“LegalEagle exposed a clause that our legal team missed. This tool is a game-changer for contract reviews.”</blockquote>
+                    <div class="author">
+                        <div class="avatar">SR</div>
+                        <div class="info">
+                            <strong>Sophia Rivera</strong>
+                            <span>General Counsel, FinSecure</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <div class="stars">★★★★☆</div>
+                    <blockquote>“The unified strategy view is exactly what we needed to align sales and legal. Incredibly intuitive.”</blockquote>
+                    <div class="author">
+                        <div class="avatar">MC</div>
+                        <div class="info">
+                            <strong>Marcus Chen</strong>
+                            <span>CEO, Nova Ventures</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>“I used it to prepare for a pitch meeting and got immediate, actionable feedback. Highly recommended.”</blockquote>
+                    <div class="author">
+                        <div class="avatar">AW</div>
+                        <div class="info">
+                            <strong>Amara Williams</strong>
+                            <span>Founder, Elevate Co.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">Pricing</span>
+                <h2 class="section-title">Choose the <span class="gradient-text">right plan</span></h2>
+                <p class="section-subtitle">
+                    Start free, scale as you grow. All plans include both AI agents.
+                </p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal">
+                    <h4>Starter</h4>
+                    <div class="price">$0 <span>/ month</span></div>
+                    <div class="description">Perfect for individuals and side projects.</div>
+                    <ul>
+                        <li>10 pitch generations</li>
+                        <li>5 contract scans</li>
+                        <li>Plain‑English translation</li>
+                        <li>Email support</li>
+                    </ul>
+                    <button class="btn-pricing">Get Started</button>
+                </div>
+                <div class="pricing-card popular reveal">
+                    <div class="popular-badge">Most Popular</div>
+                    <h4>Professional</h4>
+                    <div class="price">$29 <span>/ month</span></div>
+                    <div class="description">For serious sales teams and professionals.</div>
+                    <ul>
+                        <li>Unlimited pitch generations</li>
+                        <li>Unlimited contract scans</li>
+                        <li>Unified Strategy (coming soon)</li>
+                        <li>Priority support</li>
+                        <li>Team sharing</li>
+                    </ul>
+                    <button class="btn-pricing primary">Start Free Trial</button>
+                </div>
+                <div class="pricing-card reveal">
+                    <h4>Enterprise</h4>
+                    <div class="price">Custom</div>
+                    <div class="description">For large organizations with custom needs.</div>
+                    <ul>
+                        <li>Everything in Professional</li>
+                        <li>Custom AI models</li>
+                        <li>On‑premise deployment</li>
+                        <li>24/7 dedicated support</li>
+                        <li>SSO & compliance</li>
+                    </ul>
+                    <button class="btn-pricing">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">FAQ</span>
+                <h2 class="section-title">Frequently <span class="gradient-text">asked questions</span></h2>
+                <p class="section-subtitle">
+                    Everything you need to know about DealGuardian AI.
+                </p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item active">
+                    <div class="question">
+                        <span>What is DealGuardian AI?</span>
+                        <span class="icon-toggle">▼</span>
+                    </div>
+                    <div class="answer">DealGuardian AI is a sales intelligence platform that uses AI to generate professional pitches and scan contracts for risks, helping you close deals faster.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question">
+                        <span>How does the Pitch Generator work?</span>
+                        <span class="icon-toggle">▼</span>
+                    </div>
+                    <div class="answer">Simply paste a company's 'About Us' text. Our AI extracts industry, revenue estimates, and pain points, then crafts a 3‑sentence professional pitch tailored to that company.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question">
+                        <span>Is LegalEagle a substitute for a lawyer?</span>
+                        <span class="icon-toggle">▼</span>
+                    </div>
+                    <div class="answer">No. LegalEagle is a risk‑awareness tool that helps you spot potential issues. Always consult a qualified legal professional for final contract review.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question">
+                        <span>Do I need to create an account?</span>
+                        <span class="icon-toggle">▼</span>
+                    </div>
+                    <div class="answer">Not yet! The demo version is completely open to use. In the future, we'll offer accounts for saving history and team collaboration.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question">
+                        <span>Is my data secure?</span>
+                        <span class="icon-toggle">▼</span>
+                    </div>
+                    <div class="answer">Absolutely. We do not store any text you paste. All processing is temporary and runs in memory. Your privacy is our priority.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="homepage.html">Home</a>
+                <a href="pitch.html">Pitch Generator</a>
+                <a href="legaleagle.html">LegalEagle</a>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div style="margin-bottom:12px;">
+                <span style="font-size:24px;font-weight:900;background:linear-gradient(135deg,#00d4ff,#7b2ffc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">DealGuardian</span>
+            </div>
+            <p>&copy; 2026 DealGuardian AI. Built for the Hackathon 2026.</p>
+            <p style="margin-top:8px;font-size:13px;color:#475569;">
+                All demo data is simulated. Not a real legal or financial advice.
+            </p>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileToggle').addEventListener('click', function() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('open');
+        });
+
+        // Close menu when a link is clicked (mobile)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navMenu').classList.remove('open');
+            });
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const question = item.querySelector('.question');
+            question.addEventListener('click', () => {
+                const wasActive = item.classList.contains('active');
+                // Close all others
+                document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+                if (!wasActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Scroll reveal (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.2 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // Smooth anchor scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
