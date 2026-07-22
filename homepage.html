@@ -1,56 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealGuardian AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: #fff;
+            padding: 30px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 48px;
+            background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #aaa;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: 2px solid #2a2a4e;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .nav a:hover {
+            background: #00d4ff;
+            color: #000;
+            border-color: #00d4ff;
+        }
+        .features {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .feature-card {
+            flex: 1;
+            min-width: 200px;
+            background: #1a1a2e;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #2a2a4e;
+        }
+        .feature-card h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        .feature-card ul {
+            list-style: none;
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .btn {
+            display: inline-block;
+            background: #00d4ff;
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
 
-import streamlit as st
+<div class="container">
 
-st.set_page_config(page_title="DealGuardian AI", layout="wide")
+    <div class="header">
+        <h1>🚀 DealGuardian AI</h1>
+        <p>Close deals faster with AI-powered sales and contract intelligence</p>
+    </div>
 
-st.sidebar.title("🏢 DealGuardian AI")
-st.sidebar.markdown("---")
-st.sidebar.page_link("homepage.py", label="🏠 Home")
-st.sidebar.page_link("pitch.py", label="📈 Pitch Generator")
-st.sidebar.page_link("legaleagle.py", label="⚖️ LegalEagle")
-st.sidebar.markdown("---")
-st.sidebar.caption("Built for the Hackathon 2026")
+    <div class="nav">
+        <a href="homepage.html" style="background:#00d4ff; color:#000; border-color:#00d4ff;">🏠 Home</a>
+        <a href="pitch.html">📈 Pitch Generator</a>
+        <a href="legaleagle.html">⚖️ LegalEagle</a>
+    </div>
 
-# HOMEPAGE
-st.title("🚀 DealGuardian AI")
-st.subheader("Close Deals Faster with AI-Powered Intelligence")
+    <h2 style="margin-top:20px;">Welcome to DealGuardian AI</h2>
+    <p style="color:#aaa; font-size:18px; margin:10px 0 30px;">
+        Generate professional pitches and scan contracts in seconds.
+    </p>
 
-col1, col2 = st.columns([2, 1])
-with col1:
-    st.markdown("""
-    **DealGuardian AI** is your all-in-one sales and legal assistant.
-    
-    - 📈 **Pitch Generator** – Generate professional pitches from company bios
-    - ⚖️ **LegalEagle** – Scan contracts for hidden risks and fairness scores
-    
-    👈 **Use the sidebar to navigate.**
-    """)
-with col2:
-    st.success("✅ Ready to use")
-    st.metric("Total Agents", "4", delta="AI Powered")
+    <div class="features">
+        <div class="feature-card">
+            <h3>📈 Pitch Generator</h3>
+            <ul>
+                <li>Industry & Revenue estimates</li>
+                <li>Pain point identification</li>
+                <li>Professional 3‑sentence pitch</li>
+            </ul>
+            <a href="pitch.html" class="btn">Try Now →</a>
+        </div>
+        <div class="feature-card">
+            <h3>⚖️ LegalEagle</h3>
+            <ul>
+                <li>Fairness Score (0‑100%)</li>
+                <li>Top 3 hidden risks</li>
+                <li>Plain English translation</li>
+            </ul>
+            <a href="legaleagle.html" class="btn">Try Now →</a>
+        </div>
+    </div>
 
-st.divider()
-st.subheader("⚡ Features")
+    <div class="footer">Built for Hackathon 2026 — No backend, just a demo.</div>
 
-f_col1, f_col2 = st.columns(2)
+</div>
 
-with f_col1:
-    st.markdown("""
-    ### 📈 Pitch Generator
-    Paste a company's "About Us" text and get:
-    - Industry & Revenue estimates
-    - Pain point identification
-    - Professional 3-sentence pitch
-    """)
-
-with f_col2:
-    st.markdown("""
-    ### ⚖️ LegalEagle
-    Paste a contract or Terms of Service and get:
-    - Fairness Score (0-100%)
-    - Top 3 hidden risks
-    - Plain English translation
-    """)
-
-st.divider()
-st.caption("💡 Tip: Start by generating a pitch, then scan a contract!")
+</body>
+</html>
