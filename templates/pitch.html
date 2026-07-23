@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pitch Generator – DealGuardian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-primary: #0c0e14;
+            --bg-secondary: #11141c;
+            --bg-card: rgba(255,255,255,0.03);
+            --border-subtle: rgba(255,255,255,0.06);
+            --text-primary: #eceff4;
+            --text-secondary: #9aa2b8;
+            --text-muted: #5e667a;
+            --accent: #6b7bff;
+            --accent-dim: rgba(107,123,255,0.12);
+            --accent-glow: 0 12px 40px rgba(107,123,255,0.15);
+            --radius-lg: 20px;
+            --radius-md: 14px;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f2f4f8;
+            --bg-secondary: #e8ecf2;
+            --bg-card: rgba(255,255,255,0.7);
+            --border-subtle: rgba(0,0,0,0.08);
+            --text-primary: #1a1e2c;
+            --text-secondary: #4a5268;
+            --text-muted: #7a8298;
+            --accent: #4a5bd8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container { max-width: 1000px; margin: 0 auto; width:100%; flex:1; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(12,14,20,0.85);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo { font-size: 22px; font-weight: 800; }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: none; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a.active { color: var(--accent); font-weight: 700; }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .theme-toggle .toggle-track {
+            width: 40px;
+            height: 22px;
+            background: var(--bg-card);
+            border-radius: 40px;
+            position: relative;
+            border: 1px solid var(--border-subtle);
+        }
+        .theme-toggle .toggle-track .toggle-dot {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        [data-theme="light"] .theme-toggle .toggle-track .toggle-dot { transform: translateX(18px); }
+        .page-title { font-size: 34px; font-weight: 800; margin-bottom: 4px; }
+        .page-sub { color: var(--text-secondary); font-size: 17px; margin-bottom: 28px; }
+        .input-area {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--border-subtle);
+        }
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: var(--accent); }
+        .row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
+        .row select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 34px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { background: #7b89ff; transform: translateY(-2px); box-shadow: var(--accent-glow); }
+        .loading-bar { width: 100%; height: 4px; background: var(--border-subtle); border-radius: 4px; overflow: hidden; margin-top: 16px; display: none; }
+        .loading-bar .fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; }
+        .results { margin-top: 32px; padding: 28px; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); display: none; }
+        .results.visible { display: block; }
+        .results h3 { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+        .metric-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+        .metric { background: var(--bg-card); padding: 14px 22px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); flex: 1 1 auto; min-width: 140px; }
+        .metric-label { font-size: 12px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
+        .metric-value { font-size: 22px; font-weight: 800; margin-top: 2px; }
+        .pain-list { margin: 12px 0 20px; padding-left: 20px; color: var(--text-secondary); }
+        .pitch-box { background: var(--bg-primary); padding: 18px 22px; border-radius: var(--radius-md); border-left: 5px solid var(--accent); white-space: pre-wrap; font-family: 'Inter', monospace; font-size: 16px; line-height: 1.7; margin-top: 8px; }
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .btn-secondary { background: transparent; padding: 8px 24px; border: 1px solid var(--border-subtle); border-radius: 60px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--bg-card); }
+        .btn-accent { background: var(--accent-dim); color: var(--accent); padding: 8px 24px; border: 1px solid var(--accent); border-radius: 60px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .btn-accent:hover { background: var(--accent); color: #fff; }
+        .history-section { margin-top: 40px; border-top: 1px solid var(--border-subtle); padding-top: 24px; }
+        .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .history-item { background: var(--bg-card); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .error-msg { color: #ff6b6b; background: rgba(255,107,107,0.08); padding: 12px 16px; border-radius: var(--radius-md); border-left: 4px solid #ff6b6b; margin-top: 12px; }
+        .footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 13px; }
+        @media (max-width: 640px) { .header { flex-direction: column; } .page-title { font-size: 28px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo"><span>Deal</span>Guardian</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#" class="active">Pitch Generator</a>
+                <a href="#">LegalEagle</a>
+                <div class="theme-toggle" id="themeToggle">
+                    <span>Theme</span>
+                    <div class="toggle-track"><div class="toggle-dot"></div></div>
+                </div>
+            </div>
+        </header>
+
+        <h1 class="page-title">📊 Pitch Generator</h1>
+        <p class="page-sub">Paste a company's "About Us" text. Get REAL AI results powered by Groq.</p>
+
+        <div class="input-area">
+            <textarea id="companyText" placeholder="Paste company text here…"></textarea>
+            <div class="row">
+                <label for="styleSelect">Style:</label>
+                <select id="styleSelect">
+                    <option value="professional">Professional (B2B)</option>
+                    <option value="investor">Investor (VC)</option>
+                    <option value="elevator">Elevator (30 sec)</option>
+                    <option value="casual">Casual / Networking</option>
+                </select>
+                <button class="btn-primary" id="generateBtn">🚀 Generate Pitch</button>
+            </div>
+            <div class="loading-bar" id="loadingBar"><div class="fill" id="loadingFill"></div></div>
+        </div>
+
+        <div id="results" class="results">
+            <h3>📊 Analysis &amp; Pitch</h3>
+            <div id="output"></div>
+            <div class="action-buttons" id="actionButtons" style="display:none;">
+                <button class="btn-secondary" id="downloadTxtBtn">📥 Download .txt</button>
+                <button class="btn-accent" id="saveHistoryBtn">💾 Save to History</button>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h4>📜 Pitch History</h4>
+            <div class="history-list" id="historyList"></div>
+            <button class="btn-secondary" id="clearHistoryBtn" style="margin-top:12px;">Clear History</button>
+        </div>
+
+        <div class="footer">Built for Hackathon 2026 — Powered by Groq Llama 3.1</div>
+    </div>
+
+    <script>
+        (function() {
+            // Theme
+            const toggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const saved = localStorage.getItem('theme') || 'dark';
+            html.setAttribute('data-theme', saved);
+            toggle.addEventListener('click', function() {
+                const current = html.getAttribute('data-theme');
+                const next = (current === 'dark') ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+
+            // DOM refs
+            const companyText = document.getElementById('companyText');
+            const styleSelect = document.getElementById('styleSelect');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultsDiv = document.getElementById('results');
+            const outputDiv = document.getElementById('output');
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingFill = document.getElementById('loadingFill');
+            const actionButtons = document.getElementById('actionButtons');
+            const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+            const saveHistoryBtn = document.getElementById('saveHistoryBtn');
+            const historyList = document.getElementById('historyList');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            let currentPitchData = null;
+
+            function loadHistory() {
+                try { return JSON.parse(localStorage.getItem('pitchHistory')) || []; } catch { return []; }
+            }
+            function saveHistoryToStorage(h) { localStorage.setItem('pitchHistory', JSON.stringify(h)); }
+            function renderHistory() {
+                const history = loadHistory();
+                historyList.innerHTML = '';
+                if (history.length === 0) {
+                    historyList.innerHTML = '<div style="color:var(--text-muted);">No pitches saved yet.</div>';
+                    return;
+                }
+                history.slice().reverse().forEach((item, index) => {
+                    const realIndex = history.length - 1 - index;
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `
+                        <span style="flex:1;margin-right:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.pitch.substring(0, 80)}${item.pitch.length > 80 ? '…' : ''}</span>
+                        <span style="color:var(--text-muted);font-size:12px;">${item.date}</span>
+                        <button class="h-delete" data-index="${realIndex}" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">✕</button>
+                    `;
+                    div.querySelector('.h-delete').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const idx = parseInt(this.dataset.index);
+                        const hist = loadHistory();
+                        hist.splice(idx, 1);
+                        saveHistoryToStorage(hist);
+                        renderHistory();
+                    });
+                    historyList.appendChild(div);
+                });
+            }
+            renderHistory();
+
+            async function generatePitch() {
+                const text = companyText.value.trim();
+                if (!text) { alert('Please paste some company text.'); return; }
+                const style = styleSelect.value;
+
+                resultsDiv.classList.remove('visible');
+                loadingBar.style.display = 'block';
+                loadingFill.style.width = '0%';
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress > 95) progress = 95;
+                    loadingFill.style.width = progress + '%';
+                }, 150);
+
+                try {
+                    // Fetch from the Flask backend
+                    const response = await fetch('/generate_pitch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text, style })
+                    });
+                    const data = await response.json();
+                    clearInterval(interval);
+                    loadingFill.style.width = '100%';
+                    setTimeout(() => { loadingBar.style.display = 'none'; loadingFill.style.width = '0%'; }, 400);
+
+                    if (data.error) {
+                        resultsDiv.classList.add('visible');
+                        outputDiv.innerHTML = `<div class="error-msg">❌ ${data.error}</div>`;
+                        actionButtons.style.display = 'none';
+                        return;
+                    }
+
+                    currentPitchData = data;
+                    const painPoints = data.pain_points || [];
+                    outputDiv.innerHTML = `
+                        <div class="metric-grid">
+                            <div class="metric"><div class="metric-label">🏭 Industry</div><div class="metric-value">${data.industry}</div></div>
+                            <div class="metric"><div class="metric-label">💰 Revenue</div><div class="metric-value">${data.revenue}</div></div>
+                            <div class="metric"><div class="metric-label">🎯 Style</div><div class="metric-value" style="font-size:18px;">${style.charAt(0).toUpperCase() + style.slice(1)}</div></div>
+                        </div>
+                        ${painPoints.length ? `<p style="font-weight:600;margin-top:8px;">📌 Pain Points</p><ul class="pain-list">${painPoints.map(p => `<li>${p}</li>`).join('')}</ul>` : ''}
+                        <p style="font-weight:600;margin-top:16px;">🎤 Generated Pitch</p>
+                        <div class="pitch-box">${data.pitch}</div>
+                    `;
+                    resultsDiv.classList.add('visible');
+                    actionButtons.style.display = 'flex';
+                    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (err) {
+                    clearInterval(interval);
+                    loadingBar.style.display = 'none';
+                    resultsDiv.classList.add('visible');
+                    outputDiv.innerHTML = `<div class="error-msg">❌ Network error: ${err.message}</div>`;
+                    actionButtons.style.display = 'none';
+                }
+            }
+
+            generateBtn.addEventListener('click', generatePitch);
+            companyText.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    generatePitch();
+                }
+            });
+
+            downloadTxtBtn.addEventListener('click', function() {
+                if (!currentPitchData) return;
+                const content = `Pitch Generator – DealGuardian\n\nStyle: ${currentPitchData.style}\nIndustry: ${currentPitchData.industry}\nRevenue: ${currentPitchData.revenue}\nPain Points: ${(currentPitchData.pain_points || []).join(', ')}\n\nPitch:\n${currentPitchData.pitch}`;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pitch.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            saveHistoryBtn.addEventListener('click', function() {
+                if (!currentPitchData) return;
+                const history = loadHistory();
+                history.push({
+                    pitch: currentPitchData.pitch,
+                    industry: currentPitchData.industry,
+                    revenue: currentPitchData.revenue,
+                    style: currentPitchData.style,
+                    date: new Date().toLocaleString()
+                });
+                saveHistoryToStorage(history);
+                renderHistory();
+                alert('✅ Pitch saved!');
+            });
+
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Clear all saved pitches?')) {
+                    saveHistoryToStorage([]);
+                    renderHistory();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
