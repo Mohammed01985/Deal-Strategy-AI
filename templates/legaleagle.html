@@ -1,1 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LegalEagle – Contract Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0c0e14;
+            --bg-secondary: #11141c;
+            --bg-card: rgba(255,255,255,0.03);
+            --border-subtle: rgba(255,255,255,0.06);
+            --text-primary: #eceff4;
+            --text-secondary: #9aa2b8;
+            --text-muted: #5e667a;
+            --accent: #6b7bff;
+            --accent-dim: rgba(107,123,255,0.12);
+            --accent-glow: 0 12px 40px rgba(107,123,255,0.15);
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --green: #4caf50;
+            --yellow: #ffb74d;
+            --red: #ff6b6b;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f2f4f8;
+            --bg-secondary: #e8ecf2;
+            --bg-card: rgba(255,255,255,0.7);
+            --border-subtle: rgba(0,0,0,0.08);
+            --text-primary: #1a1e2c;
+            --text-secondary: #4a5268;
+            --text-muted: #7a8298;
+            --accent: #4a5bd8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container { max-width: 1100px; margin: 0 auto; width:100%; flex:1; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(12,14,20,0.85);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo { font-size: 22px; font-weight: 800; }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: none; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a.active { color: var(--accent); font-weight: 700; }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .theme-toggle .toggle-track {
+            width: 40px;
+            height: 22px;
+            background: var(--bg-card);
+            border-radius: 40px;
+            position: relative;
+            border: 1px solid var(--border-subtle);
+        }
+        .theme-toggle .toggle-track .toggle-dot {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        [data-theme="light"] .theme-toggle .toggle-track .toggle-dot { transform: translateX(18px); }
+        .page-title { font-size: 34px; font-weight: 800; margin-bottom: 4px; }
+        .page-sub { color: var(--text-secondary); font-size: 17px; margin-bottom: 28px; }
+        .input-area {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--border-subtle);
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: var(--accent); }
+        .row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 34px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { background: #7b89ff; transform: translateY(-2px); box-shadow: var(--accent-glow); }
+        .loading-bar { width: 100%; height: 4px; background: var(--border-subtle); border-radius: 4px; overflow: hidden; margin-top: 16px; display: none; }
+        .loading-bar .fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; }
+        .results { margin-top: 32px; padding: 28px; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); display: none; }
+        .results.visible { display: block; }
+        .score-section { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--bg-card);
+            border: 6px solid var(--accent);
+            color: var(--text-primary);
+        }
+        .score-label { font-size: 14px; color: var(--text-muted); }
+        .risk-grid { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+        .risk-item {
+            background: var(--bg-card);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            border-left: 5px solid var(--red);
+            flex: 1 1 200px;
+        }
+        .plain-box {
+            background: var(--bg-primary);
+            padding: 18px 22px;
+            border-radius: var(--radius-md);
+            border-left: 5px solid var(--green);
+            white-space: pre-wrap;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-top: 8px;
+        }
+        .counter-list { list-style: none; padding: 0; }
+        .counter-list li { background: var(--bg-card); padding: 12px 16px; margin: 6px 0; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .btn-secondary { background: transparent; padding: 8px 24px; border: 1px solid var(--border-subtle); border-radius: 60px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--bg-card); }
+        .btn-accent { background: var(--accent-dim); color: var(--accent); padding: 8px 24px; border: 1px solid var(--accent); border-radius: 60px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .btn-accent:hover { background: var(--accent); color: #fff; }
+        .error-msg { color: #ff6b6b; background: rgba(255,107,107,0.08); padding: 12px 16px; border-radius: var(--radius-md); border-left: 4px solid #ff6b6b; margin-top: 12px; }
+        .footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 13px; }
+        @media (max-width: 640px) { .header { flex-direction: column; } .page-title { font-size: 28px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo"><span>Legal</span>Eagle</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#" class="active">Contract Analyzer</a>
+                <a href="#">Pitch Generator</a>
+                <div class="theme-toggle" id="themeToggle">
+                    <span>Theme</span>
+                    <div class="toggle-track"><div class="toggle-dot"></div></div>
+                </div>
+            </div>
+        </header>
 
+        <h1 class="page-title">⚖️ LegalEagle</h1>
+        <p class="page-sub">Paste any Terms of Service or contract. Our 4 AI agents dissect it and give you a clear verdict.</p>
+
+        <div class="input-area">
+            <textarea id="contractText" placeholder="Paste the full contract text here…"></textarea>
+            <div class="row">
+                <button class="btn-primary" id="analyzeBtn">🦅 Analyze Contract</button>
+            </div>
+            <div class="loading-bar" id="loadingBar"><div class="fill" id="loadingFill"></div></div>
+        </div>
+
+        <div id="results" class="results">
+            <h3>📊 Analysis Dashboard</h3>
+            <div id="output"></div>
+            <div class="action-buttons" id="actionButtons" style="display:none;">
+                <button class="btn-secondary" id="downloadPdfBtn">📄 Download PDF Report</button>
+                <button class="btn-accent" id="saveAnalysisBtn">💾 Save to History</button>
+            </div>
+        </div>
+
+        <div class="footer">Built for Hackathon 2026 — Powered by Groq Llama 3.1</div>
+    </div>
+
+    <script>
+        (function() {
+            // Theme toggle
+            const toggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const saved = localStorage.getItem('theme') || 'dark';
+            html.setAttribute('data-theme', saved);
+            toggle.addEventListener('click', function() {
+                const current = html.getAttribute('data-theme');
+                const next = (current === 'dark') ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+
+            const contractText = document.getElementById('contractText');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsDiv = document.getElementById('results');
+            const outputDiv = document.getElementById('output');
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingFill = document.getElementById('loadingFill');
+            const actionButtons = document.getElementById('actionButtons');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            const saveAnalysisBtn = document.getElementById('saveAnalysisBtn');
+            let currentData = null;
+
+            async function analyzeContract() {
+                const text = contractText.value.trim();
+                if (!text) { alert('Please paste a contract.'); return; }
+
+                resultsDiv.classList.remove('visible');
+                loadingBar.style.display = 'block';
+                loadingFill.style.width = '0%';
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress > 95) progress = 95;
+                    loadingFill.style.width = progress + '%';
+                }, 150);
+
+                try {
+                    const response = await fetch('/analyze_contract', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text })
+                    });
+                    const data = await response.json();
+                    clearInterval(interval);
+                    loadingFill.style.width = '100%';
+                    setTimeout(() => { loadingBar.style.display = 'none'; loadingFill.style.width = '0%'; }, 400);
+
+                    if (data.error) {
+                        resultsDiv.classList.add('visible');
+                        outputDiv.innerHTML = `<div class="error-msg">❌ ${data.error}</div>`;
+                        actionButtons.style.display = 'none';
+                        return;
+                    }
+
+                    currentData = data;
+                    const score = data.fairness_score;
+                    const riskColor = score >= 70 ? 'var(--green)' : (score >= 40 ? 'var(--yellow)' : 'var(--red)');
+                    const riskLabel = score >= 70 ? 'Fair' : (score >= 40 ? 'Risky' : 'Unfair');
+
+                    outputDiv.innerHTML = `
+                        <div class="score-section">
+                            <div class="score-circle" style="border-color:${riskColor};">${score}%</div>
+                            <div>
+                                <div style="font-size:18px;font-weight:700;">Fairness Score</div>
+                                <div class="score-label">${riskLabel} — based on user protections</div>
+                            </div>
+                        </div>
+                        <h4>🚨 Hidden Risks (3)</h4>
+                        <div class="risk-grid">
+                            ${data.risks.map(r => `<div class="risk-item">${r}</div>`).join('')}
+                        </div>
+                        <h4>📖 Plain English Version</h4>
+                        <div class="plain-box">${data.plain_english}</div>
+                        <h4 style="margin-top:20px;">🤝 Suggested Counter‑Offers</h4>
+                        <ul class="counter-list">
+                            ${data.counter_offers.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    `;
+                    resultsDiv.classList.add('visible');
+                    actionButtons.style.display = 'flex';
+                    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (err) {
+                    clearInterval(interval);
+                    loadingBar.style.display = 'none';
+                    resultsDiv.classList.add('visible');
+                    outputDiv.innerHTML = `<div class="error-msg">❌ Network error: ${err.message}</div>`;
+                    actionButtons.style.display = 'none';
+                }
+            }
+
+            analyzeBtn.addEventListener('click', analyzeContract);
+            contractText.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    analyzeContract();
+                }
+            });
+
+            // PDF download (uses html2canvas + jsPDF)
+            downloadPdfBtn.addEventListener('click', function() {
+                const element = document.getElementById('results');
+                if (!element) return;
+                html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.save('LegalEagle_Report.pdf');
+                }).catch(err => {
+                    alert('Could not generate PDF: ' + err);
+                });
+            });
+
+            saveAnalysisBtn.addEventListener('click', function() {
+                if (!currentData) return;
+                let history = JSON.parse(localStorage.getItem('legalHistory') || '[]');
+                history.push({
+                    score: currentData.fairness_score,
+                    risks: currentData.risks,
+                    plain: currentData.plain_english.substring(0, 200),
+                    date: new Date().toLocaleString()
+                });
+                localStorage.setItem('legalHistory', JSON.stringify(history));
+                alert('✅ Analysis saved!');
+            });
+        })();
+    </script>
+</body>
+</html>
