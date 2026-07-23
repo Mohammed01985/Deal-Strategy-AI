@@ -22,7 +22,6 @@
             --accent: #6b7bff;
             --accent-dim: rgba(107, 123, 255, 0.12);
             --accent-glow: 0 12px 40px rgba(107, 123, 255, 0.15);
-            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
             --header-bg: rgba(12, 14, 20, 0.85);
             --footer-border: rgba(255, 255, 255, 0.06);
             --radius-lg: 20px;
@@ -213,12 +212,13 @@
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <header class="header">
             <div class="logo"><span>Deal</span>Guardian</div>
             <div class="nav-links">
-                <a href="#">Home</a>
+                <a href="homepage.html">Home</a>
                 <a href="#" class="active">Pitch Generator</a>
-                <a href="#">LegalEagle</a>
+                <a href="legaleagle.html">LegalEagle</a>
                 <div class="theme-toggle" id="themeToggle" role="button" tabindex="0">
                     <span class="toggle-label">Theme</span>
                     <div class="toggle-track"><div class="toggle-dot"></div></div>
@@ -226,8 +226,9 @@
             </div>
         </header>
 
+        <!-- MAIN -->
         <h1 class="page-title">📊 Pitch Generator</h1>
-        <p class="page-sub">Paste a company's "About Us" text. Choose a style. Get a real AI pitch.</p>
+        <p class="page-sub">Paste a company's "About Us" text. Choose a style. Get a professional pitch.</p>
 
         <div class="input-area">
             <textarea id="companyText" placeholder="Paste company text here… e.g. We are a coffee shop struggling with supply chain costs…"></textarea>
@@ -244,6 +245,7 @@
             <div class="loading-bar" id="loadingBar"><div class="fill" id="loadingFill"></div></div>
         </div>
 
+        <!-- RESULTS -->
         <div id="results" class="results">
             <h3>📊 Analysis &amp; Pitch</h3>
             <div id="output"></div>
@@ -253,18 +255,19 @@
             </div>
         </div>
 
+        <!-- HISTORY -->
         <div class="history-section">
             <h4>📜 Pitch History</h4>
             <div class="history-list" id="historyList"></div>
             <button class="btn-secondary" id="clearHistoryBtn" style="margin-top:12px;">Clear History</button>
         </div>
 
-        <div class="footer">Built for Hackathon 2026 — Powered by Groq AI (Llama 3.1)</div>
+        <div class="footer">Built for Hackathon 2026 — Mock AI Demo</div>
     </div>
 
     <script>
         (function() {
-            // Theme
+            // ---------- THEME ----------
             const toggle = document.getElementById('themeToggle');
             const html = document.documentElement;
             const saved = localStorage.getItem('theme') || 'dark';
@@ -276,6 +279,7 @@
                 localStorage.setItem('theme', next);
             });
 
+            // ---------- DOM refs ----------
             const companyText = document.getElementById('companyText');
             const styleSelect = document.getElementById('styleSelect');
             const generateBtn = document.getElementById('generateBtn');
@@ -288,8 +292,10 @@
             const saveHistoryBtn = document.getElementById('saveHistoryBtn');
             const historyList = document.getElementById('historyList');
             const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
             let currentPitchData = null;
 
+            // ---------- HISTORY ----------
             function loadHistory() {
                 try { return JSON.parse(localStorage.getItem('pitchHistory')) || []; } catch { return []; }
             }
@@ -323,63 +329,97 @@
             }
             renderHistory();
 
-            async function generatePitch() {
+            // ---------- GENERATE PITCH (Mock AI – Works Offline) ----------
+            function generatePitch() {
                 const text = companyText.value.trim();
                 if (!text) { alert('Please paste some company text.'); return; }
                 const style = styleSelect.value;
+
                 resultsDiv.classList.remove('visible');
                 loadingBar.style.display = 'block';
                 loadingFill.style.width = '0%';
+
                 let progress = 0;
                 const interval = setInterval(() => {
                     progress += Math.random() * 15 + 5;
                     if (progress > 95) progress = 95;
                     loadingFill.style.width = progress + '%';
-                }, 200);
+                }, 150);
 
-                try {
-                    const response = await fetch('/generate_pitch', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text, style })
-                    });
-                    const data = await response.json();
+                setTimeout(() => {
                     clearInterval(interval);
                     loadingFill.style.width = '100%';
-                    setTimeout(() => { loadingBar.style.display = 'none'; loadingFill.style.width = '0%'; }, 500);
+                    setTimeout(() => {
+                        loadingBar.style.display = 'none';
+                        loadingFill.style.width = '0%';
+                    }, 400);
 
-                    if (data.error) {
-                        resultsDiv.classList.add('visible');
-                        outputDiv.innerHTML = `<div class="error-msg">❌ ${data.error}</div>`;
-                        actionButtons.style.display = 'none';
-                        return;
+                    // ----- Mock Data -----
+                    const lower = text.toLowerCase();
+                    let industry = 'Technology';
+                    let revenue = '$5M – $10M';
+                    let painPoints = ['High operational costs', 'Customer retention'];
+                    let pitch = 'We help businesses streamline operations with cutting-edge AI solutions. Our platform reduces costs by 30% within the first quarter. Let us transform your company today.';
+
+                    if (lower.includes('coffee') || lower.includes('cafe') || lower.includes('brew')) {
+                        industry = 'Food & Beverage';
+                        revenue = '$2M – $5M';
+                        painPoints = ['Supply chain disruptions', 'Rising ingredient costs'];
+                        pitch = 'We provide smart supply chain management for coffee shops. Our AI predicts demand and reduces waste by 40%. Partner with us to brew success.';
+                    } else if (lower.includes('software') || lower.includes('saas') || lower.includes('app')) {
+                        industry = 'SaaS / Software';
+                        revenue = '$10M – $50M';
+                        painPoints = ['Long sales cycles', 'High churn rate'];
+                        pitch = 'Our sales automation platform shortens your sales cycle by 45%. We integrate seamlessly with your CRM. Scale your revenue with confidence.';
+                    } else if (lower.includes('restaurant') || lower.includes('food') || lower.includes('kitchen')) {
+                        industry = 'Hospitality';
+                        revenue = '$3M – $8M';
+                        painPoints = ['Staff shortages', 'Inventory management'];
+                        pitch = 'We optimize restaurant operations with AI-driven scheduling and inventory control. Reduce waste and boost staff productivity. Your restaurant, supercharged.';
+                    } else if (lower.includes('ecommerce') || lower.includes('shop') || lower.includes('store')) {
+                        industry = 'E‑commerce';
+                        revenue = '$8M – $20M';
+                        painPoints = ['Cart abandonment', 'Logistics inefficiencies'];
+                        pitch = 'Our AI-powered personalization engine boosts conversion rates by 25%. We streamline your logistics for faster delivery. Grow your online store with us.';
                     }
 
-                    currentPitchData = data;
-                    const painPoints = data.pain_points || [];
+                    // Style variation
+                    if (style === 'investor') {
+                        pitch = 'We are revolutionizing the ' + industry.toLowerCase() + ' industry with a scalable AI platform. Our solution addresses ' + painPoints[0].toLowerCase() + ' and ' + painPoints[1].toLowerCase() + ' — a $50B market opportunity. We are seeking strategic partners to accelerate our growth.';
+                    } else if (style === 'elevator') {
+                        pitch = 'We help ' + industry.toLowerCase() + ' companies overcome ' + painPoints[0].toLowerCase() + ' using AI. Our platform delivers measurable results. Let\'s talk.';
+                    } else if (style === 'casual') {
+                        pitch = 'Hey! We\'re building an AI platform for ' + industry.toLowerCase() + ' companies. We solve ' + painPoints[0].toLowerCase() + ' and ' + painPoints[1].toLowerCase() + '. Would love to chat about how we can help you!';
+                    }
+
+                    currentPitchData = {
+                        industry,
+                        revenue,
+                        pain_points: painPoints,
+                        pitch,
+                        style
+                    };
+
                     outputDiv.innerHTML = `
                         <div class="metric-grid">
-                            <div class="metric"><div class="metric-label">🏭 Industry</div><div class="metric-value">${data.industry}</div></div>
-                            <div class="metric"><div class="metric-label">💰 Revenue</div><div class="metric-value">${data.revenue}</div></div>
+                            <div class="metric"><div class="metric-label">🏭 Industry</div><div class="metric-value">${industry}</div></div>
+                            <div class="metric"><div class="metric-label">💰 Revenue</div><div class="metric-value">${revenue}</div></div>
                             <div class="metric"><div class="metric-label">🎯 Style</div><div class="metric-value" style="font-size:18px;">${style.charAt(0).toUpperCase() + style.slice(1)}</div></div>
                         </div>
-                        ${painPoints.length ? `<p style="font-weight:600; margin-top:8px;">📌 Pain Points</p><ul class="pain-list">${painPoints.map(p => `<li>${p}</li>`).join('')}</ul>` : ''}
+                        <p style="font-weight:600; margin-top:8px;">📌 Pain Points</p>
+                        <ul class="pain-list">${painPoints.map(p => `<li>${p}</li>`).join('')}</ul>
                         <p style="font-weight:600; margin-top:16px;">🎤 Generated Pitch</p>
-                        <div class="pitch-box">${data.pitch}</div>
+                        <div class="pitch-box">${pitch}</div>
                     `;
                     resultsDiv.classList.add('visible');
                     actionButtons.style.display = 'flex';
                     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } catch (err) {
-                    clearInterval(interval);
-                    loadingBar.style.display = 'none';
-                    resultsDiv.classList.add('visible');
-                    outputDiv.innerHTML = `<div class="error-msg">❌ Network error: ${err.message}</div>`;
-                    actionButtons.style.display = 'none';
-                }
+                }, 2000);
             }
 
             generateBtn.addEventListener('click', generatePitch);
+
+            // Ctrl+Enter shortcut
             companyText.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                     e.preventDefault();
@@ -387,9 +427,11 @@
                 }
             });
 
+            // ---------- DOWNLOAD .TXT ----------
             downloadTxtBtn.addEventListener('click', function() {
                 if (!currentPitchData) return;
-                const content = `PITCH GENERATOR – DealGuardian\n\nStyle: ${currentPitchData.style}\nIndustry: ${currentPitchData.industry}\nRevenue: ${currentPitchData.revenue}\nPain Points: ${(currentPitchData.pain_points || []).join(', ')}\n\nPitch:\n${currentPitchData.pitch}`;
+                const content =
+                    `PITCH GENERATOR – DealGuardian\n\nStyle: ${currentPitchData.style}\nIndustry: ${currentPitchData.industry}\nRevenue: ${currentPitchData.revenue}\nPain Points: ${(currentPitchData.pain_points || []).join(', ')}\n\nPitch:\n${currentPitchData.pitch}`;
                 const blob = new Blob([content], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -399,6 +441,7 @@
                 URL.revokeObjectURL(url);
             });
 
+            // ---------- SAVE TO HISTORY ----------
             saveHistoryBtn.addEventListener('click', function() {
                 if (!currentPitchData) return;
                 const history = loadHistory();
@@ -411,9 +454,10 @@
                 });
                 saveHistoryToStorage(history);
                 renderHistory();
-                alert('Pitch saved to history!');
+                alert('✅ Pitch saved to history!');
             });
 
+            // ---------- CLEAR HISTORY ----------
             clearHistoryBtn.addEventListener('click', function() {
                 if (confirm('Clear all saved pitches?')) {
                     saveHistoryToStorage([]);
